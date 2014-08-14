@@ -212,3 +212,8 @@ $RECYCLE.BIN/
 *.msi
 *.msm
 *.msp
+
+Visual Micro/
+*.atsln
+*.atsuo
+*.cppproj
