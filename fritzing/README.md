@@ -1,0 +1,3 @@
+This was my first project making my own PCB and I made a mess of it. The "- mega" file shows the actual logical layout of the project. I struggled to translate that into headers and wires, and ended up with the "- PCB3" file which generated the gerbers.
+
+I also discovered that I didn't get enough power into my speaker using the 50 mA power from the Arduino mega PWM signal, so I created a separate small audio breakout board which fits into the 5V pins on the Mega.
