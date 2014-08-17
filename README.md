@@ -1,6 +1,6 @@
 Ultimate Alarm Clock
 ====================
-![Alarm Clock](/photos/assembled.jpg)
+![Alarm Clock](/images/assembled.jpg)
 
 Everybody who gets into Arduino makes a clock, and this one is mine. The unique attributes of my clock are:
 - Time is synchronized with UTC via a GPS module
