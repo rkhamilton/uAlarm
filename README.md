@@ -11,3 +11,7 @@ Everybody who gets into Arduino makes a clock, and this one is mine. The unique 
 - It uses a custom PCB that sits like a mini-shield on top of an Arduino Mega 2560. There is a second micro-shield as an audio amplifier to correct the low audio volume supplied by the main board.
 - The whole package is in a custom laser cut enclosure with painted, engraved labels
 - It has a funny missile-switch toggle for turning the alarm on and off
+
+#Acknowledgments
+* [Timezone](https://github.com/JChristensen/Timezone)
+* [TinyGPS++](http://arduiniana.org/libraries/tinygpsplus/)
