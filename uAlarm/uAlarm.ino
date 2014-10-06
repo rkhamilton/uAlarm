@@ -9,6 +9,7 @@
 #include <Timezone.h>
 #include <TinyGPS++.h>
 #include <Time.h>
+#include "Streaming.h"
 
 //for the Adafruit 7-segment display I2C backpack
 #include <Wire.h>
@@ -19,7 +20,7 @@
 //#define DEBUG_FAKE_GPS
 //#define DEBUG_PRINT_BRIGHTNESS
 //#define DEBUG_PRINT_LOOP_SPEED
-#define DEBUG_TEST_TONE
+//#define DEBUG_TEST_TONE
 
 #define GPS_TIME_UPDATE_INTERVAL_SECS 10
 #define SNOOZE_DURATION_MINS 5
@@ -70,7 +71,7 @@ time_t nextDisplay = 0; // when to next update the numeric display
 boolean alarmOn;
 byte alarmHour = 12; // 24 hour time
 byte alarmMin = 0;
-boolean alarmAMPM = true; // false == AM, true == PM
+//boolean alarmAMPM = true; // false == AM, true == PM
 boolean snoozePressed = false;
 boolean currentlyAlarming = false;
 
@@ -141,7 +142,7 @@ void setup() {
     //TODO
 
     //communicate output to a PC
-    Serial.begin(115200);
+    Serial.begin(9600);
 
     #ifdef DEBUG_FAKE_GPS
     while (*gpsStream) if (gps.encode(*gpsStream++)) displayGPSInfo();
@@ -164,16 +165,17 @@ void loop() {
     
     //the first time we identify our location, calculate the time zone offset
     if (!locationFound && gps.location.isValid()) {
+        locationFound = true;
         Serial.println("loop: first location lock");
         //based on our location, determine our GMT offset, and whether our location uses DST
         setTimeZoneAndDST(gps.location.lat(), gps.location.lng());
-        locationFound = true;
         //stop blinking the display
         sevenSegmentDisplay.blinkRate(0);
         //set up sync provider for Time.h
         setSyncProvider(gpsTimeSync);
         setSyncInterval(GPS_TIME_UPDATE_INTERVAL_SECS);
         setTime(gpsTimeSync());
+        delay(10);
     }
 
     readSwitchesUpdateAlarmTime();
@@ -217,7 +219,6 @@ void loop() {
             currentMode = LCDTime;
             digitalClockSerialDisplay();
             writeTimeDisplay(alarmHour,alarmMin,true);
-            Serial.println("showing alarm time");
     }
 
 #ifdef DEBUG_PRINT_LOOP_SPEED
@@ -1439,8 +1440,6 @@ void digitalClockSerialDisplay(){
     Serial.print(alarmHour);
     Serial.print(" alarmMin: ");
     Serial.print(alarmMin);
-    Serial.print(" alarmAMPM: ");
-    Serial.print(alarmAMPM);
     Serial.print(" currentlyAlarming: ");
     Serial.print(currentlyAlarming);
     Serial.println();
@@ -1607,9 +1606,9 @@ void readSwitchesUpdateAlarmTime() {
     byte	minSwitchVal;
     static byte	prevHourSwitchVal = 255;
     static byte	preMinSwitchVal = 255;
-    boolean alarmAMPM;
     static boolean prevAlarmAMPM = false;
     boolean alarmOnSwitchVal;
+    boolean alarmAMPM;
     
     //read all of the switches positions
     hourSwitchVal	= AlarmHourSwitchValue(); // noon == 0
@@ -1618,12 +1617,15 @@ void readSwitchesUpdateAlarmTime() {
     //if the alarm switch is flipped off then turn off the alarm
     alarmOnSwitchVal = (digitalRead(alarmOnPin)==LOW);
     
+     
     if ((hourSwitchVal != prevHourSwitchVal)|| 
         (minSwitchVal != preMinSwitchVal)   || 
         (alarmAMPM != prevAlarmAMPM)        || 
         (!alarmOn && alarmOnSwitchVal) ) // someone deliberately changed a knob position
     {
-        alarmHour = hourSwitchVal + 12 * (byte)alarmAMPM;
+        Serial << alarmOn << alarmOnSwitchVal << ":" << prevHourSwitchVal << preMinSwitchVal << prevAlarmAMPM << "-->";
+        Serial << hourSwitchVal << minSwitchVal << alarmAMPM << endl;
+       alarmHour = hourSwitchVal + 12 * (byte)alarmAMPM;
         alarmMin = minSwitchVal;
         prevHourSwitchVal = hourSwitchVal;
         preMinSwitchVal = minSwitchVal;
